@@ -1,0 +1,24 @@
+# Создать именованный пайп ( named pipe ).
+# Вывести в файл через созданный pipe вывод команды ss -plnt
+
+
+Ответ:
+Создаем named pipe "mypipe" командой "mkfifo"
+# [root@slonit-test dev]# mkfifo mypipe
+
+Далее используем команды в фоновом режиме, либо 2 терминала
+Я буду использовать 2 терминала
+
+Терминал 1:
+# [root@slonit-test dev]# cat < mypipe > res.txt
+
+Терминал 2:
+# [root@slonit-test dev]# ss -plnt > mypipe
+
+В результате получаем файл res.txt
+# [root@slonit-test dev]# ls
+# mypipe  res.txt
+# 
+# [root@slonit-test dev]# cat res.txt
+# State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+# LISTEN 0      128          0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=1133,fd=5))

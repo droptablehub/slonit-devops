@@ -1,0 +1,22 @@
+# При помощи HEREDOC записать в файл многострочное сообщение
+
+
+Ответ:
+Создаем многострочное сообщение
+# [root@slonit-test test]# cat <<EOF > text.txt
+# > 1
+# > 2
+# > 3
+# > 4
+# > 5
+# > EOF
+
+Проверяем наличие и содержимое созданного нами файла
+# [root@slonit-test test]# ls
+# archive-pipe  messages.tar.gz  text.txt
+# [root@slonit-test test]# cat text.txt
+# 1
+# 2
+# 3
+# 4
+# 5

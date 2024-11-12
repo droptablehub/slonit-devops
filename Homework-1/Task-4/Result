@@ -1,0 +1,12 @@
+# Вывести дату в unixtime
+# На вход команды date через пайп подать свой формат выводимой даты
+
+
+Ответ:
+
+# [root@slonit-test ~]# date
+# Tue Nov 12 00:01:14 UTC 2024
+# [root@slonit-test ~]# date +%s
+# 1731369681
+# [root@slonit-test ~]# date +%s | xargs -I{} date -d @{} +"%d-%m-%Y"
+# 12-11-2024

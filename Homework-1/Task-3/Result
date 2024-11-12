@@ -1,0 +1,22 @@
+# При помощи именованного пайпа заархивировать всё, что в него отправляем.
+# Например, содержимое файла /var/log/messages
+# На выходе получить архив tar или любой другой
+
+
+Ответ:
+
+Создаю named pipe "archive-pipe"
+# [root@slonit-test test]# mkfifo archive-pipe
+
+Терминал 1:
+Запускаю команду для архивирования
+# [root@slonit-test ~]# tar czf test/messages.tar.gz -C /var/log messages < test/archive-pipe
+
+Терминал 2:
+Читаю messages
+# [root@slonit-test ~]# cat /var/log/messages > test/archive-pipe
+
+Результат:
+# [root@slonit-test ~]# cd test
+# [root@slonit-test test]# ls
+# archive-pipe  messages.tar.gz
