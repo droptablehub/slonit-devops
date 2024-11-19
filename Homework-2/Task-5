@@ -1,0 +1,53 @@
+# Все события ssh записывать параллельно в отдельный файл
+# производить ротацию каждые сутки или по размеру (не более 1 мегабайта)
+# всего 10 файлов в ротации
+
+
+Ответ:
+# [root@slonit-test ~]# cd /etc/rsyslog.d/
+# [root@slonit-test rsyslog.d]# sudo nano ssh.conf
+
+Записываю строку:
+# :programname, isequal, "sshd"           /var/log/ssh.log
+
+Создаю файл для логов
+# [root@slonit-test ~]# cd /var/log/
+# [root@slonit-test log]# touch ssh.log
+
+Зашел с 2 терминала и проверяю работу логов:
+# [root@slonit-test log]# cat ssh.log
+# Nov 19 22:27:18 slonit-test sshd[1199]: Accepted publickey for root from 136.169.243.76 port 7779 ssh2: RSA SHA256:AXInOVfRtasxbqz8VrliAHEL+pvglCg1138jxnkKcVg
+# Nov 19 22:27:19 slonit-test sshd[1199]: pam_unix(sshd:session): session opened for user root by (uid=0)
+
+Создаю конфигурацию для ротации:
+# [root@slonit-test log]# cd /etc/logrotate.d/
+# [root@slonit-test logrotate.d]# sudo nano ssh
+# /var/log/ssh.log {
+#         daily
+#         rotate 10
+#         size 1M
+#         compress
+#         delaycompress
+#         missingok
+#         notifempty
+#         create 640 root
+#         postrotate
+#                 systemctl restart rsyslog
+#         endscript
+# }
+
+Запускаю несколько раз принудительную ротацию:
+# [root@slonit-test logrotate.d]# sudo logrotate -f /etc/logrotate.d/ssh
+
+В /var/log появились файлы:
+# -rw-r-----. 1 root   root         0 Nov 19 22:46 ssh.log
+# -rw-r-----. 1 root   root       301 Nov 19 22:45 ssh.log.1
+# -rw-r-----. 1 root   root       174 Nov 19 22:41 ssh.log.10.gz
+# -rw-r-----. 1 root   root       218 Nov 19 22:45 ssh.log.2.gz
+# -rw-r-----. 1 root   root       173 Nov 19 22:45 ssh.log.3.gz
+# -rw-r-----. 1 root   root       219 Nov 19 22:45 ssh.log.4.gz
+# -rw-r-----. 1 root   root       174 Nov 19 22:45 ssh.log.5.gz
+# -rw-r-----. 1 root   root       171 Nov 19 22:45 ssh.log.6.gz
+# -rw-r-----. 1 root   root       218 Nov 19 22:45 ssh.log.7.gz
+# -rw-r-----. 1 root   root       172 Nov 19 22:44 ssh.log.8.gz
+# -rw-r-----. 1 root   root       218 Nov 19 22:43 ssh.log.9.gz

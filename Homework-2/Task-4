@@ -1,0 +1,65 @@
+# Создать конфигурацию syslog для отправки сообщений
+# уровня info в файл /var/log/my.log
+
+
+Ответ:
+
+# [root@slonit-test ~]# sudo nano /etc/rsyslog.conf
+
+Добавляю строки:
+# Send info messages to /var/log/my.log
+*.info                                                   /var/log/my.log
+
+Добавляю файл с логами
+# [root@slonit-test ~]# sudo touch /var/log/my.log
+# [root@slonit-test log]# ls -ll
+# -rw-r--r--. 1 root   root         0 Nov 19 22:10 my.log
+
+Меняю права
+# [root@slonit-test log]# sudo chmod 640 /var/log/my.log
+# [root@slonit-test log]# ls -ll
+# -rw-r-----. 1 root   root         0 Nov 19 22:10 my.log
+
+Перезапускаю rsyslog
+# [root@slonit-test log]# sudo systemctl restart rsyslog
+
+Запускаю тестовое сообщение
+# [root@slonit-test log]# logger -p user.info "test info test info test info"
+
+Проверяю результат:
+# [root@slonit-test log]# cat my.log
+# Nov 19 22:13:32 slonit-test sudo[1096]:    root : TTY=pts/0 ; PWD=/var/log ; USER=root ; COMMAND=/bin/systemctl restart rsyslog
+# Nov 19 22:13:32 slonit-test sudo[1096]: pam_unix(sudo:session): session opened for user root by root(uid=0)
+# Nov 19 22:13:32 slonit-test systemd[1]: Stopping System Logging Service...
+# Nov 19 22:13:32 slonit-test rsyslogd[898]: [origin software="rsyslogd" swVersion="8.2102.0-7.el8_6.1" x-pid="898" x-info="https://www.rsyslog.com"] exiting on signal 15.
+# Nov 19 22:13:32 slonit-test systemd[1]: rsyslog.service: Succeeded.
+# Nov 19 22:13:32 slonit-test systemd[1]: Stopped System Logging Service.
+# Nov 19 22:13:32 slonit-test systemd[1]: Starting System Logging Service...
+# Nov 19 22:13:32 slonit-test rsyslogd[1101]: [origin software="rsyslogd" swVersion="8.2102.0-7.el8_6.1" x-pid="1101" x-info="https://www.rsyslog.com"] start
+# Nov 19 22:13:32 slonit-test systemd[1]: Started System Logging Service.
+# Nov 19 22:13:32 slonit-test sudo[1096]: pam_unix(sudo:session): session closed for user root
+# Nov 19 22:13:32 slonit-test rsyslogd[1101]: imjournal: journal files changed, reloading...  [v8.2102.0-7.el8_6.1 try https://www.rsyslog.com/e/0 ]
+# Nov 19 22:14:21 slonit-test root[1107]: test info test info test info
+
+
+Зашел с 2 терминала:
+# [root@slonit-test log]# cat my.log
+# Nov 19 22:13:32 slonit-test sudo[1096]:    root : TTY=pts/0 ; PWD=/var/log ; USER=root ; COMMAND=/bin/systemctl restart rsyslog
+# Nov 19 22:13:32 slonit-test sudo[1096]: pam_unix(sudo:session): session opened for user root by root(uid=0)
+# Nov 19 22:13:32 slonit-test systemd[1]: Stopping System Logging Service...
+# Nov 19 22:13:32 slonit-test rsyslogd[898]: [origin software="rsyslogd" swVersion="8.2102.0-7.el8_6.1" x-pid="898" x-info="https://www.rsyslog.com"] exiting on signal 15.
+# Nov 19 22:13:32 slonit-test systemd[1]: rsyslog.service: Succeeded.
+# Nov 19 22:13:32 slonit-test systemd[1]: Stopped System Logging Service.
+# Nov 19 22:13:32 slonit-test systemd[1]: Starting System Logging Service...
+# Nov 19 22:13:32 slonit-test rsyslogd[1101]: [origin software="rsyslogd" swVersion="8.2102.0-7.el8_6.1" x-pid="1101" x-info="https://www.rsyslog.com"] start
+# Nov 19 22:13:32 slonit-test systemd[1]: Started System Logging Service.
+# Nov 19 22:13:32 slonit-test sudo[1096]: pam_unix(sudo:session): session closed for user root
+# Nov 19 22:13:32 slonit-test rsyslogd[1101]: imjournal: journal files changed, reloading...  [v8.2102.0-7.el8_6.1 try https://www.rsyslog.com/e/0 ]
+# Nov 19 22:14:21 slonit-test root[1107]: test info test info test info
+# Nov 19 22:14:29 slonit-test sshd[1108]: error: kex_exchange_identification: read: Connection reset by peer
+# Nov 19 22:14:31 slonit-test sshd[1111]: Invalid user  from 8.219.222.66 port 13724
+# Nov 19 22:14:31 slonit-test sshd[1111]: Connection closed by invalid user  8.219.222.66 port 13724 [preauth]
+# Nov 19 22:15:59 slonit-test sshd[1114]: Accepted publickey for root from 136.169.243.76 port 7661 ssh2: RSA SHA256:AXInOVfRtasxbqz8VrliAHEL+pvglCg1138jxnkKcVg
+# Nov 19 22:15:59 slonit-test systemd[1]: Started Session 3 of user root.
+# Nov 19 22:15:59 slonit-test systemd-logind[622]: New session 3 of user root.
+# Nov 19 22:15:59 slonit-test sshd[1114]: pam_unix(sshd:session): session opened for user root by (uid=0)
